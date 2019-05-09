@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
+
 	"github.com/yitume/caller"
 	"github.com/yitume/caller/ginsession"
 	"github.com/yitume/caller/gorm"
@@ -10,7 +11,7 @@ import (
 
 var cfg = `
 [callerGinSession]
-	name = "mysession"
+    name = "mysession"
     size = 10
     network = "tcp"
     addr = "127.0.0.1:6379"
@@ -38,37 +39,33 @@ var cfg = `
     debug = true
     level = "debug"
     path = "./system.log"
-
 `
 var (
-	Db      *gorm.GormClient
-	Logger  *zap.ZapClient
+	Db      *gorm.Client
+	Logger  *zap.Client
 	Session gin.HandlerFunc
 )
 
 func main() {
-	caller.Init(
+	if err := caller.Init(
 		cfg,
 		zap.New,
 		gorm.New,
 		ginsession.New,
-	)
+	); err != nil {
+		panic(err)
+	}
 
 	initModel()
-
 	type User struct {
 		Uid  int
 		Name string
 	}
-
 	u := User{}
 	Db.Table("user").Where("uid=?", 1).Find(&u)
-
 	Logger.Info("hello world")
 	r := gin.New()
-
 	r.Use(ginsession.Caller())
-
 }
 
 func initModel() {

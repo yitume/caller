@@ -2,18 +2,18 @@ package caller
 
 import (
 	"fmt"
-	"github.com/yitume/caller/common"
 	"io/ioutil"
+
+	"github.com/yitume/caller/common"
 )
 
-func Init(cfg interface{}, callers ...common.CallerFunc) error {
+func Init(cfg interface{}, callers ...common.CallerFunc) (err error) {
 	var cfgByte []byte
-	var err error
 	switch cfg.(type) {
 	case string:
 		cfgByte, err = parseFile(cfg.(string))
 		if err != nil {
-			return err
+			return
 		}
 	case []byte:
 		cfgByte = cfg.([]byte)
@@ -23,8 +23,9 @@ func Init(cfg interface{}, callers ...common.CallerFunc) error {
 
 	for _, caller := range callers {
 		obj := caller()
-		obj.InitCfg(cfgByte)
-
+		if err = obj.InitCfg(cfgByte); err != nil {
+			return
+		}
 	}
 	return nil
 }

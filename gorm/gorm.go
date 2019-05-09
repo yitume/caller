@@ -1,33 +1,35 @@
 package gorm
 
 import (
-	fmt "fmt"
+	"fmt"
+	"log"
+
 	"github.com/BurntSushi/toml"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
+
 	"github.com/yitume/caller/common"
-	"log"
 )
 
 var defaultCaller *callerStore
 
 type callerStore struct {
-	caller map[string]*GormClient
+	caller map[string]*Client
 	cfg    Cfg
 }
 
-type GormClient struct {
+type Client struct {
 	*gorm.DB
 }
 
 func New() common.Caller {
 	defaultCaller = &callerStore{
-		caller: make(map[string]*GormClient, 0),
+		caller: make(map[string]*Client, 0),
 	}
 	return defaultCaller
 }
 
-func Caller(name string) *GormClient {
+func Caller(name string) *Client {
 	return defaultCaller.caller[name]
 }
 
@@ -44,7 +46,7 @@ func (c *callerStore) Get(key string) interface{} {
 }
 
 func (c *callerStore) Set(key string, val interface{}) {
-	c.caller[key] = val.(*GormClient)
+	c.caller[key] = val.(*Client)
 }
 
 func (c *callerStore) initCaller() {
@@ -70,7 +72,7 @@ func parseConfig(cfg []byte, value interface{}) error {
 	return nil
 }
 
-func provider(cfg CallerCfg) (resp *GormClient, err error) {
+func provider(cfg CallerCfg) (resp *Client, err error) {
 	fmt.Println(cfg)
 
 	var db *gorm.DB
@@ -90,6 +92,6 @@ func provider(cfg CallerCfg) (resp *GormClient, err error) {
 	if err != nil {
 		return
 	}
-	resp = &GormClient{db}
+	resp = &Client{db}
 	return
 }

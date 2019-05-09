@@ -3,32 +3,34 @@ package zap
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/BurntSushi/toml"
+	"log"
+
 	"github.com/yitume/caller/common"
+
+	"github.com/BurntSushi/toml"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
-	"log"
 )
 
 var defaultCaller *callerStore
 
 type callerStore struct {
-	caller map[string]*ZapClient
+	caller map[string]*Client
 	cfg    Cfg
 }
 
-type ZapClient struct {
+type Client struct {
 	*zap.Logger
 }
 
 func New() common.Caller {
 	defaultCaller = &callerStore{
-		caller: make(map[string]*ZapClient, 0),
+		caller: make(map[string]*Client, 0),
 	}
 	return defaultCaller
 }
 
-func Caller(name string) *ZapClient {
+func Caller(name string) *Client {
 	return defaultCaller.caller[name]
 }
 
@@ -45,7 +47,7 @@ func (c *callerStore) Get(key string) interface{} {
 }
 
 func (c *callerStore) Set(key string, val interface{}) {
-	c.caller[key] = val.(*ZapClient)
+	c.caller[key] = val.(*Client)
 }
 
 func (c *callerStore) initCaller() {
@@ -63,7 +65,7 @@ func parseConfig(cfg []byte, value interface{}) error {
 	return nil
 }
 
-func provider(cfg CallerCfg) (db *ZapClient) {
+func provider(cfg CallerCfg) (db *Client) {
 	var js string
 	if cfg.Debug {
 		js = fmt.Sprintf(`{
@@ -92,5 +94,5 @@ func provider(cfg CallerCfg) (db *ZapClient) {
 	if err != nil {
 		log.Fatal("init logger error: ", err)
 	}
-	return &ZapClient{l}
+	return &Client{l}
 }

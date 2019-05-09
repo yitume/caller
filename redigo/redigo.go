@@ -1,33 +1,35 @@
 package redigo
 
 import (
-	"github.com/BurntSushi/toml"
-	"github.com/yitume/caller/common"
-	"github.com/gomodule/redigo/redis"
 	"log"
 	"os"
 	"time"
+
+	"github.com/BurntSushi/toml"
+	"github.com/gomodule/redigo/redis"
+
+	"github.com/yitume/caller/common"
 )
 
 var defaultCaller *callerStore
 
 type callerStore struct {
-	caller map[string]*RedigoClient
+	caller map[string]*Client
 	cfg    Cfg
 }
 
-type RedigoClient struct {
+type Client struct {
 	pool *redis.Pool
 }
 
 func New() common.Caller {
 	defaultCaller = &callerStore{
-		caller: make(map[string]*RedigoClient, 0),
+		caller: make(map[string]*Client, 0),
 	}
 	return defaultCaller
 }
 
-func Caller(name string) *RedigoClient {
+func Caller(name string) *Client {
 	return defaultCaller.caller[name]
 }
 
@@ -44,7 +46,7 @@ func (c *callerStore) Get(key string) interface{} {
 }
 
 func (c *callerStore) Set(key string, val interface{}) {
-	c.caller[key] = val.(*RedigoClient)
+	c.caller[key] = val.(*Client)
 }
 
 func (c *callerStore) initCaller() {
@@ -62,7 +64,7 @@ func parseConfig(cfg []byte, value interface{}) error {
 	return nil
 }
 
-func provider(cfg CallerCfg) (resp *RedigoClient) {
+func provider(cfg CallerCfg) (resp *Client) {
 	dialOptions := []redis.DialOption{
 		redis.DialConnectTimeout(cfg.ConnectTimeout.Duration),
 		redis.DialReadTimeout(cfg.ReadTimeout.Duration),
@@ -71,7 +73,7 @@ func provider(cfg CallerCfg) (resp *RedigoClient) {
 		redis.DialPassword(cfg.Password),
 	}
 
-	resp = &RedigoClient{
+	resp = &Client{
 		&redis.Pool{
 			Dial: func() (redis.Conn, error) {
 				c, err := redis.Dial("tcp", cfg.Addr, dialOptions...)

@@ -11,7 +11,7 @@ type Cfg struct {
 type CallerCfg struct {
 	Debug bool
 
-	Network        string //tcp
+	Network        string // tcp
 	Addr           string // 127.0.0.1:6379
 	DB             int
 	Password       string
