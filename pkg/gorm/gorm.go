@@ -8,7 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 
-	"github.com/yitume/caller/common"
+	"github.com/yitume/caller/pkg/common"
 )
 
 var defaultCaller *callerStore

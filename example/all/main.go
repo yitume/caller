@@ -4,9 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/yitume/caller"
-	"github.com/yitume/caller/ginsession"
-	"github.com/yitume/caller/gorm"
-	"github.com/yitume/caller/zap"
+	"github.com/yitume/caller/pkg/ginsession"
+	"github.com/yitume/caller/pkg/gorm"
+	"github.com/yitume/caller/pkg/zap"
 )
 
 var cfg = `
@@ -24,8 +24,8 @@ var cfg = `
     dialect = "mysql"
     addr = "127.0.0.1:3306"
     username = "root"
-    password = ""
-    db = "default"
+    password = "root"
+    db = "shop"
     charset = "utf8"
     parseTime = "True"
     loc = "Local"
@@ -48,7 +48,7 @@ var (
 
 func main() {
 	if err := caller.Init(
-		cfg,
+		[]byte(cfg),
 		zap.New,
 		gorm.New,
 		ginsession.New,

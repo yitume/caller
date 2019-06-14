@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/yitume/caller/common"
+	"github.com/yitume/caller/pkg/common"
 )
 
 func Init(cfg interface{}, callers ...common.CallerFunc) (err error) {
