@@ -1,7 +1,7 @@
 package redigo
 
 import (
-	"github.com/yitume/caller/common"
+	"github.com/yitume/caller/pkg/common"
 )
 
 type Cfg struct {

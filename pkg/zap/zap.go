@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/yitume/caller/common"
+	"github.com/yitume/caller/pkg/common"
 
 	"github.com/BurntSushi/toml"
 	"go.uber.org/zap"

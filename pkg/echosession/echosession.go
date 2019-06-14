@@ -1,18 +1,17 @@
-package ginsession
+package echosession
 
 import (
 	"github.com/BurntSushi/toml"
-	"github.com/gin-contrib/sessions"
-	"github.com/gin-contrib/sessions/redis"
-	"github.com/gin-gonic/gin"
+	"github.com/ipfans/echo-session"
+	"github.com/labstack/echo"
 
-	"github.com/yitume/caller/common"
+	"github.com/yitume/caller/pkg/common"
 )
 
 var defaultCaller *callerStore
 
 type callerStore struct {
-	caller gin.HandlerFunc
+	caller echo.HandlerFunc
 	cfg    Cfg
 }
 
@@ -21,7 +20,7 @@ func New() common.Caller {
 	return defaultCaller
 }
 
-func Caller() gin.HandlerFunc {
+func Caller() echo.HandlerFunc {
 	return defaultCaller.caller
 }
 
@@ -38,11 +37,11 @@ func (c *callerStore) Get(key string) interface{} {
 }
 
 func (c *callerStore) Set(key string, val interface{}) {
-	c.caller = val.(gin.HandlerFunc)
+	c.caller = val.(echo.HandlerFunc)
 }
 
 func (c *callerStore) initCaller() {
-	caller, err := provider(c.cfg.CallerGinSession)
+	caller, err := provider(c.cfg.CallerEchoSession)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -57,9 +56,8 @@ func parseConfig(cfg []byte, value interface{}) error {
 	return nil
 }
 
-func provider(cfg CallerCfg) (session gin.HandlerFunc, err error) {
-	var store redis.Store
-	store, err = redis.NewStore(cfg.Size, cfg.Network, cfg.Addr, cfg.Pwd, []byte(cfg.Keypairs))
-	session = sessions.Sessions(cfg.Name, store)
+func provider(cfg CallerCfg) (s echo.MiddlewareFunc, err error) {
+	store, err := session.NewRedisStore(cfg.Size, cfg.Network, cfg.Addr, cfg.Pwd, []byte(cfg.Keypairs))
+	s = session.Sessions(cfg.Name, store)
 	return
 }
